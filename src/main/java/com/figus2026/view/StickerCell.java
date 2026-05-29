@@ -57,14 +57,14 @@ public class StickerCell extends JPanel {
 
     /**
      * Determina si la celda está activa en la vista actual.
-     * En vista TENGO: activa si el estado es LATE.
+     * En vista TENGO: activa si el estado es LATE o REPE.
      * En vista REPETIDAS: activa si el estado es REPE.
      */
     public boolean isActivaEnVistaActual() {
         boolean esVistaTengo = mainFrame.isVistaTengoActiva();
         Estado est = figurita.getEstado();
         if (esVistaTengo) {
-            return est == Estado.LATE;
+            return est == Estado.LATE || est == Estado.REPE;
         } else {
             return est == Estado.REPE;
         }
@@ -119,8 +119,8 @@ public class StickerCell extends JPanel {
                 // Agregar a REPETIDAS -> pasa a REPE
                 mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.REPE);
             } else {
-                // Quitar de REPETIDAS -> pasa a NOLA
-                mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.NOLA);
+                // Quitar de REPETIDAS -> pasa a LATE
+                mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.LATE);
             }
         }
 

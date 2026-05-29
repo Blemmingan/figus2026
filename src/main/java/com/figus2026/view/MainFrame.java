@@ -351,6 +351,7 @@ public class MainFrame extends JFrame {
                 if (f.getEstado() == Estado.LATE) {
                     totalTengo++;
                 } else if (f.getEstado() == Estado.REPE) {
+                    totalTengo++;
                     totalRepes++;
                 }
             }
@@ -375,7 +376,6 @@ public class MainFrame extends JFrame {
      */
     private void exportarAlPortapapeles() {
         StringBuilder sb = new StringBuilder();
-        Estado estadoBuscado = vistaTengoActiva ? Estado.LATE : Estado.REPE;
 
         sb.append(vistaTengoActiva ? "TENGO:" : "REPETIDAS:").append("\n");
 
@@ -388,7 +388,13 @@ public class MainFrame extends JFrame {
 
             // Filtrar las figuritas que corresponden a este estado
             java.util.List<Integer> numeros = figuritas.stream()
-                    .filter(f -> f.getEstado() == estadoBuscado)
+                    .filter(f -> {
+                        if (vistaTengoActiva) {
+                            return f.getEstado() == Estado.LATE || f.getEstado() == Estado.REPE;
+                        } else {
+                            return f.getEstado() == Estado.REPE;
+                        }
+                    })
                     .map(Figurita::getNumero)
                     .sorted()
                     .collect(Collectors.toList());
