@@ -130,7 +130,27 @@ public class MainFrame extends JFrame {
         btnExportar.setForeground(Color.WHITE);
         btnExportar.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
         btnExportar.setPreferredSize(new Dimension(110, 36));
-        btnExportar.addActionListener(e -> exportarAlPortapapeles());
+        btnExportar.addActionListener(e -> {
+            JPopupMenu menuExportar = new JPopupMenu();
+            
+            JMenuItem itemTengo = new JMenuItem("Exportar TENGO");
+            itemTengo.setFont(Theme.FONT_BUTTON);
+            itemTengo.addActionListener(ev -> exportarAlPortapapeles("TENGO"));
+            
+            JMenuItem itemRepe = new JMenuItem("Exportar REPETIDAS");
+            itemRepe.setFont(Theme.FONT_BUTTON);
+            itemRepe.addActionListener(ev -> exportarAlPortapapeles("REPETIDAS"));
+            
+            JMenuItem itemNola = new JMenuItem("Exportar NOLA (Faltantes)");
+            itemNola.setFont(Theme.FONT_BUTTON);
+            itemNola.addActionListener(ev -> exportarAlPortapapeles("NOLA"));
+            
+            menuExportar.add(itemTengo);
+            menuExportar.add(itemRepe);
+            menuExportar.add(itemNola);
+            
+            menuExportar.show(btnExportar, 0, btnExportar.getHeight());
+        });
 
         panelAcciones.add(btnToggleModo);
         panelAcciones.add(btnExportar);
@@ -372,12 +392,14 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Exporta el contenido de la vista activa al portapapeles en el formato plano exacto requerido.
+     * Exporta el contenido filtrado por el tipo indicado al portapapeles en el formato plano exacto requerido.
+     * 
+     * @param tipo El tipo de exportación ("TENGO", "REPETIDAS", o "NOLA").
      */
-    private void exportarAlPortapapeles() {
+    private void exportarAlPortapapeles(String tipo) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(vistaTengoActiva ? "TENGO:" : "REPETIDAS:").append("\n");
+        sb.append(tipo).append(":\n");
 
         boolean hayFigus = false;
 
@@ -389,10 +411,12 @@ public class MainFrame extends JFrame {
             // Filtrar las figuritas que corresponden a este estado
             java.util.List<Integer> numeros = figuritas.stream()
                     .filter(f -> {
-                        if (vistaTengoActiva) {
+                        if (tipo.equals("TENGO")) {
                             return f.getEstado() == Estado.LATE || f.getEstado() == Estado.REPE;
-                        } else {
+                        } else if (tipo.equals("REPETIDAS")) {
                             return f.getEstado() == Estado.REPE;
+                        } else {
+                            return f.getEstado() == Estado.NOLA;
                         }
                     })
                     .map(Figurita::getNumero)
@@ -424,7 +448,7 @@ public class MainFrame extends JFrame {
 
             // Toast feedback popup premium
             JOptionPane.showMessageDialog(this,
-                    "¡Listado exportado al portapapeles con éxito!",
+                    "¡Listado de " + tipo + " exportado al portapapeles con éxito!",
                     "Exportar",
                     JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
