@@ -289,6 +289,31 @@ public class FlagManager {
     }
 
     /**
+     * Obtiene el emoji de la bandera para un código de país.
+     *
+     * @param codigoPais Código de 3 letras del álbum.
+     * @return String con el emoji de la bandera o un placeholder.
+     */
+    public String getFlagEmoji(String codigoPais) {
+        if ("FWC".equals(codigoPais)) {
+            return "🏆";
+        }
+        
+        String iso = CODIGOS_ISO.get(codigoPais);
+        if (iso == null || iso.length() < 2) {
+            return "🏳️"; // Default flag
+        }
+        
+        if (iso.equals("gb-sct")) return "🏴󠁧󠁢󠁳󠁣󠁴󠁿";
+        if (iso.equals("gb-eng")) return "🏴󠁧󠁢󠁥󠁮󠁧󠁿";
+        
+        int firstChar = Character.toUpperCase(iso.charAt(0)) - 'A' + 0x1F1E6;
+        int secondChar = Character.toUpperCase(iso.charAt(1)) - 'A' + 0x1F1E6;
+        
+        return new String(Character.toChars(firstChar)) + new String(Character.toChars(secondChar));
+    }
+
+    /**
      * Apaga ordenadamente el pool de descargas.
      */
     public void shutdown() {

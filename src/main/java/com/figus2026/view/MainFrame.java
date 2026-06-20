@@ -425,7 +425,8 @@ public class MainFrame extends JFrame {
 
             if (!numeros.isEmpty()) {
                 hayFigus = true;
-                sb.append(pais).append(": ");
+                String emoji = flagManager.getFlagEmoji(pais);
+                sb.append(emoji).append(" ").append(pais).append(": ");
                 for (int i = 0; i < numeros.size(); i++) {
                     sb.append(numeros.get(i));
                     if (i < numeros.size() - 1) {
