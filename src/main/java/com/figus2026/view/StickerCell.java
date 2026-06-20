@@ -1,6 +1,5 @@
 package com.figus2026.view;
 
-import com.figus2026.model.Estado;
 import com.figus2026.model.Figurita;
 
 import javax.swing.*;
@@ -57,16 +56,16 @@ public class StickerCell extends JPanel {
 
     /**
      * Determina si la celda está activa en la vista actual.
-     * En vista TENGO: activa si el estado es LATE o REPE.
-     * En vista REPETIDAS: activa si el estado es REPE.
+     * En vista TENGO: activa si qty >= 1.
+     * En vista REPETIDAS: activa si qty > 1.
      */
     public boolean isActivaEnVistaActual() {
         boolean esVistaTengo = mainFrame.isVistaTengoActiva();
-        Estado est = figurita.getEstado();
+        int qty = figurita.getQty();
         if (esVistaTengo) {
-            return est == Estado.LATE || est == Estado.REPE;
+            return qty >= 1;
         } else {
-            return est == Estado.REPE;
+            return qty > 1;
         }
     }
 
@@ -75,14 +74,13 @@ public class StickerCell extends JPanel {
      */
     public boolean isInteractuable() {
         boolean esModoAgregar = mainFrame.isModoAgregarActivo();
-        boolean activa = isActivaEnVistaActual();
+        boolean esVistaTengo = mainFrame.isVistaTengoActiva();
+        int qty = figurita.getQty();
 
-        if (esModoAgregar) {
-            // En modo Agregar, solo interactúan las celdas inactivas en esta vista
-            return !activa;
+        if (esVistaTengo) {
+            return esModoAgregar ? qty == 0 : qty >= 1;
         } else {
-            // En modo Quitar, solo interactúan las celdas activas en esta vista
-            return activa;
+            return esModoAgregar ? qty >= 1 : qty > 1;
         }
     }
 
@@ -105,22 +103,19 @@ public class StickerCell extends JPanel {
 
         boolean esVistaTengo = mainFrame.isVistaTengoActiva();
         boolean esModoAgregar = mainFrame.isModoAgregarActivo();
+        int qty = figurita.getQty();
 
         if (esVistaTengo) {
             if (esModoAgregar) {
-                // Agregar a TENGO -> pasa a LATE
-                mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.LATE);
+                mainFrame.getAlbum().setQtyFigurita(figurita.getCodigo(), 1);
             } else {
-                // Quitar de TENGO -> pasa a NOLA
-                mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.NOLA);
+                mainFrame.getAlbum().setQtyFigurita(figurita.getCodigo(), 0);
             }
         } else {
             if (esModoAgregar) {
-                // Agregar a REPETIDAS -> pasa a REPE
-                mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.REPE);
+                mainFrame.getAlbum().setQtyFigurita(figurita.getCodigo(), qty + 1);
             } else {
-                // Quitar de REPETIDAS -> pasa a LATE
-                mainFrame.getAlbum().cambiarEstadoFigurita(figurita.getCodigo(), Estado.LATE);
+                mainFrame.getAlbum().setQtyFigurita(figurita.getCodigo(), Math.max(1, qty - 1));
             }
         }
 
@@ -197,7 +192,9 @@ public class StickerCell extends JPanel {
         // Si está en hover activo y es interactuable, opcionalmente dibujamos un símbolo sutil (+ o -)
         String texto = String.valueOf(figurita.getNumero());
         if (mouseHovering && isInteractuable()) {
-            if (esModoAgregar) {
+            if (!esVistaTengo && activa) {
+                texto = String.valueOf(figurita.getQty() - 1);
+            } else if (esModoAgregar) {
                 texto = "+";
             } else {
                 texto = "-";

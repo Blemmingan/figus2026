@@ -1,7 +1,6 @@
 package com.figus2026.view;
 
 import com.figus2026.model.Album;
-import com.figus2026.model.Estado;
 import com.figus2026.model.Figurita;
 import com.figus2026.util.FlagManager;
 
@@ -368,11 +367,12 @@ public class MainFrame extends JFrame {
 
         for (LinkedList<Figurita> figs : album.getPaisesFiguritas().values()) {
             for (Figurita f : figs) {
-                if (f.getEstado() == Estado.LATE) {
+                int qty = f.getQty();
+                if (qty >= 1) {
                     totalTengo++;
-                } else if (f.getEstado() == Estado.REPE) {
-                    totalTengo++;
-                    totalRepes++;
+                    if (qty > 1) {
+                        totalRepes += (qty - 1);
+                    }
                 }
             }
         }
@@ -409,27 +409,31 @@ public class MainFrame extends JFrame {
             LinkedList<Figurita> figuritas = entry.getValue();
 
             // Filtrar las figuritas que corresponden a este estado
-            java.util.List<Integer> numeros = figuritas.stream()
+            java.util.List<Figurita> filteredFigs = figuritas.stream()
                     .filter(f -> {
+                        int qty = f.getQty();
                         if (tipo.equals("TENGO")) {
-                            return f.getEstado() == Estado.LATE || f.getEstado() == Estado.REPE;
+                            return qty >= 1;
                         } else if (tipo.equals("REPETIDAS")) {
-                            return f.getEstado() == Estado.REPE;
+                            return qty > 1;
                         } else {
-                            return f.getEstado() == Estado.NOLA;
+                            return qty == 0;
                         }
                     })
-                    .map(Figurita::getNumero)
-                    .sorted()
+                    .sorted(java.util.Comparator.comparingInt(Figurita::getNumero))
                     .collect(Collectors.toList());
 
-            if (!numeros.isEmpty()) {
+            if (!filteredFigs.isEmpty()) {
                 hayFigus = true;
                 String emoji = flagManager.getFlagEmoji(pais);
                 sb.append(emoji).append(" ").append(pais).append(": ");
-                for (int i = 0; i < numeros.size(); i++) {
-                    sb.append(numeros.get(i));
-                    if (i < numeros.size() - 1) {
+                for (int i = 0; i < filteredFigs.size(); i++) {
+                    Figurita f = filteredFigs.get(i);
+                    sb.append(f.getNumero());
+                    if (tipo.equals("REPETIDAS") && f.getQty() > 2) {
+                        sb.append(" (x").append(f.getQty() - 1).append(")");
+                    }
+                    if (i < filteredFigs.size() - 1) {
                         sb.append(", ");
                     }
                 }

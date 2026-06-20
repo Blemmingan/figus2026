@@ -8,24 +8,24 @@ import java.util.Objects;
 public class Figurita {
     private final String codigo;
     private final String pais;
-    private Estado estado;
+    private int qty;
 
     /**
      * Crea una nueva figurita con el código y estado inicial.
      * El país se extrae automáticamente de las primeras 3 letras del código.
      *
-     * @param codigo Código de la figurita (3 letras mayúsculas seguidas de un número sin espacios).
-     * @param estado Estado inicial de la figurita.
+     * @param codigo Código de la figurita (3 letras mayúsculas seguidas de un
+     *               número sin espacios).
      * @throws IllegalArgumentException si el formato del código es inválido.
      */
-    public Figurita(String codigo, Estado estado) {
+    public Figurita(String codigo) {
         if (codigo == null || !codigo.matches("^[A-Z]{3}\\d+$")) {
-            throw new IllegalArgumentException("Código de figurita inválido: " + codigo + 
+            throw new IllegalArgumentException("Código de figurita inválido: " + codigo +
                     ". Debe estar compuesto por 3 letras mayúsculas seguidas de un número.");
         }
         this.codigo = codigo;
         this.pais = codigo.substring(0, 3);
-        this.estado = Objects.requireNonNull(estado, "El estado no puede ser nulo");
+        this.qty = 0;
     }
 
     public String getCodigo() {
@@ -36,12 +36,12 @@ public class Figurita {
         return pais;
     }
 
-    public Estado getEstado() {
-        return estado;
+    public int getQty() {
+        return qty;
     }
 
-    public void setEstado(Estado estado) {
-        this.estado = Objects.requireNonNull(estado, "El estado no puede ser nulo");
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 
     /**
@@ -56,8 +56,10 @@ public class Figurita {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Figurita figurita = (Figurita) o;
         return Objects.equals(codigo, figurita.codigo);
     }
@@ -72,7 +74,7 @@ public class Figurita {
         return "Figurita{" +
                 "codigo='" + codigo + '\'' +
                 ", pais='" + pais + '\'' +
-                ", estado=" + estado +
+                ", qty=" + qty +
                 '}';
     }
 }

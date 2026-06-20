@@ -9,7 +9,8 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * Representa el álbum completo de figuritas, organizando las figuritas por países y grupos,
+ * Representa el álbum completo de figuritas, organizando las figuritas por
+ * países y grupos,
  * y gestionando la persistencia de datos de forma automática.
  */
 public class Album {
@@ -22,27 +23,29 @@ public class Album {
     // Estructura de grupos predefinida
     public static final LinkedHashMap<String, String[]> GRUPOS = new LinkedHashMap<>();
     static {
-        GRUPOS.put("Grupo A", new String[]{"MEX", "RSA", "KOR", "CZE"});
-        GRUPOS.put("Grupo B", new String[]{"CAN", "BIH", "QAT", "SUI"});
-        GRUPOS.put("Grupo C", new String[]{"BRA", "MAR", "HAI", "SCO"});
-        GRUPOS.put("Grupo D", new String[]{"USA", "PAR", "AUS", "TUR"});
-        GRUPOS.put("Grupo E", new String[]{"GER", "CUW", "CIV", "ECU"});
-        GRUPOS.put("Grupo F", new String[]{"NED", "JPN", "SWE", "TUN"});
-        GRUPOS.put("Grupo G", new String[]{"BEL", "EGY", "IRN", "NZL"});
-        GRUPOS.put("Grupo H", new String[]{"ESP", "CPV", "KSA", "URU"});
-        GRUPOS.put("Grupo I", new String[]{"FRA", "SEN", "IRQ", "NOR"});
-        GRUPOS.put("Grupo J", new String[]{"ARG", "ALG", "AUT", "JOR"});
-        GRUPOS.put("Grupo K", new String[]{"POR", "COD", "UZB", "COL"});
-        GRUPOS.put("Grupo L", new String[]{"ENG", "CRO", "GHA", "PAN"});
-        GRUPOS.put("Especiales", new String[]{"FWC"});
+        GRUPOS.put("Grupo A", new String[] { "MEX", "RSA", "KOR", "CZE" });
+        GRUPOS.put("Grupo B", new String[] { "CAN", "BIH", "QAT", "SUI" });
+        GRUPOS.put("Grupo C", new String[] { "BRA", "MAR", "HAI", "SCO" });
+        GRUPOS.put("Grupo D", new String[] { "USA", "PAR", "AUS", "TUR" });
+        GRUPOS.put("Grupo E", new String[] { "GER", "CUW", "CIV", "ECU" });
+        GRUPOS.put("Grupo F", new String[] { "NED", "JPN", "SWE", "TUN" });
+        GRUPOS.put("Grupo G", new String[] { "BEL", "EGY", "IRN", "NZL" });
+        GRUPOS.put("Grupo H", new String[] { "ESP", "CPV", "KSA", "URU" });
+        GRUPOS.put("Grupo I", new String[] { "FRA", "SEN", "IRQ", "NOR" });
+        GRUPOS.put("Grupo J", new String[] { "ARG", "ALG", "AUT", "JOR" });
+        GRUPOS.put("Grupo K", new String[] { "POR", "COD", "UZB", "COL" });
+        GRUPOS.put("Grupo L", new String[] { "ENG", "CRO", "GHA", "PAN" });
+        GRUPOS.put("Especiales", new String[] { "FWC" });
     }
 
-    // Mapa principal que asocia cada código de país con su lista doblemente enlazada (LinkedList) de figuritas
+    // Mapa principal que asocia cada código de país con su lista doblemente
+    // enlazada (LinkedList) de figuritas
     private final LinkedHashMap<String, LinkedList<Figurita>> paisesFiguritas;
 
     /**
      * Inicializa un nuevo álbum.
-     * Si existe un archivo guardado, carga su estado. De lo contrario, inicializa todo en NOLA.
+     * Si existe un archivo guardado, carga su estado. De lo contrario, inicializa
+     * todo en NOLA.
      */
     public Album() {
         this.paisesFiguritas = new LinkedHashMap<>();
@@ -61,7 +64,7 @@ public class Album {
                 int cantidad = pais.equals("FWC") ? 19 : 20;
                 for (int i = 1; i <= cantidad; i++) {
                     String codigo = pais + i;
-                    figuritas.add(new Figurita(codigo, Estado.NOLA));
+                    figuritas.add(new Figurita(codigo));
                 }
                 paisesFiguritas.put(pais, figuritas);
             }
@@ -71,7 +74,8 @@ public class Album {
     /**
      * Retorna el mapa completo de figuritas agrupadas por país.
      *
-     * @return LinkedHashMap que preserva el orden de países, asociando cada uno a su LinkedList de figuritas.
+     * @return LinkedHashMap que preserva el orden de países, asociando cada uno a
+     *         su LinkedList de figuritas.
      */
     public LinkedHashMap<String, LinkedList<Figurita>> getPaisesFiguritas() {
         return paisesFiguritas;
@@ -94,7 +98,8 @@ public class Album {
      * @return La Figurita correspondiente, o null si no se encuentra.
      */
     public Figurita getFigurita(String codigo) {
-        if (codigo == null || codigo.length() < 4) return null;
+        if (codigo == null || codigo.length() < 4)
+            return null;
         String pais = codigo.substring(0, 3);
         LinkedList<Figurita> figuritas = paisesFiguritas.get(pais);
         if (figuritas != null) {
@@ -108,28 +113,29 @@ public class Album {
     }
 
     /**
-     * Actualiza el estado de una figurita y guarda el álbum de forma automática.
+     * Actualiza la cantidad (qty) de una figurita y guarda el álbum de forma automática.
      *
      * @param codigo Código de la figurita.
-     * @param nuevoEstado El nuevo Estado (NOLA, LATE, REPE).
+     * @param qty    La nueva cantidad.
      */
-    public void cambiarEstadoFigurita(String codigo, Estado nuevoEstado) {
+    public void setQtyFigurita(String codigo, int qty) {
         Figurita figurita = getFigurita(codigo);
         if (figurita != null) {
-            figurita.setEstado(nuevoEstado);
+            figurita.setQty(qty);
             guardarEstado();
         }
     }
 
     /**
      * Guarda el estado actual del álbum en formato JSON en el archivo album.json.
-     * Si no puede escribir en el directorio actual, lo guarda en el directorio de usuario.
+     * Si no puede escribir en el directorio actual, lo guarda en el directorio de
+     * usuario.
      */
     public synchronized void guardarEstado() {
-        Map<String, String> estadoMap = new HashMap<>();
+        Map<String, Integer> estadoMap = new HashMap<>();
         for (LinkedList<Figurita> lista : paisesFiguritas.values()) {
             for (Figurita f : lista) {
-                estadoMap.put(f.getCodigo(), f.getEstado().name());
+                estadoMap.put(f.getCodigo(), f.getQty());
             }
         }
 
@@ -175,18 +181,22 @@ public class Album {
 
         try (FileReader reader = new FileReader(fileToLoad)) {
             Gson gson = new Gson();
-            Type mapType = new TypeToken<Map<String, String>>(){}.getType();
-            Map<String, String> estadoMap = gson.fromJson(reader, mapType);
+            Type mapType = new TypeToken<Map<String, Object>>() {
+            }.getType();
+            Map<String, Object> estadoMap = gson.fromJson(reader, mapType);
 
             if (estadoMap != null) {
                 for (LinkedList<Figurita> lista : paisesFiguritas.values()) {
                     for (Figurita f : lista) {
-                        String estadoNombre = estadoMap.get(f.getCodigo());
-                        if (estadoNombre != null) {
-                            try {
-                                f.setEstado(Estado.valueOf(estadoNombre));
-                            } catch (IllegalArgumentException e) {
-                                f.setEstado(Estado.NOLA);
+                        Object val = estadoMap.get(f.getCodigo());
+                        if (val != null) {
+                            if (val instanceof Number) {
+                                f.setQty(((Number) val).intValue());
+                            } else if (val instanceof String) {
+                                String estadoNombre = (String) val;
+                                if (estadoNombre.equals("NOLA")) f.setQty(0);
+                                else if (estadoNombre.equals("LATE")) f.setQty(1);
+                                else if (estadoNombre.equals("REPE")) f.setQty(2);
                             }
                         }
                     }
@@ -194,7 +204,9 @@ public class Album {
                 System.out.println("Estado del álbum cargado con éxito desde " + fileToLoad.getAbsolutePath());
             }
         } catch (Exception e) {
-            System.err.println("Error al cargar el archivo de guardado. Se inicializará con valores por defecto. Detalle: " + e.getMessage());
+            System.err.println(
+                    "Error al cargar el archivo de guardado. Se inicializará con valores por defecto. Detalle: "
+                            + e.getMessage());
         }
     }
 }
